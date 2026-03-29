@@ -60,3 +60,83 @@ button {
     border-radius: 5px;
     cursor: pointer;
 }
+.manga-card .info {
+    padding: 10px;
+    text-align: center;
+    background: #1e1e1e;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.manga-card h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #e50914; /* Rouge style Netflix/Manga */
+}
+
+.manga-card p {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+    color: #aaa;
+}
+/* Positionnement de la base */
+.manga-card {
+    position: relative;
+    display: block;
+}
+
+/* Style de la bulle d'info - POSITIONNÉE SUR LE CÔTÉ */
+.manga-tooltip {
+    position: absolute;
+    top: 0; 
+    left: 105%; /* Se place à droite de l'image */
+    width: 280px;
+    background: rgba(20, 20, 20, 0.98);
+    color: #eee;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e50914;
+    box-shadow: 10px 10px 30px rgba(0,0,0,0.8);
+    z-index: 100;
+    
+    /* Animation de transition */
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+/* La petite flèche pointant vers l'image */
+.manga-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: 100%; /* Pointe vers la gauche */
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent #e50914 transparent transparent;
+}
+
+/* Affichage au survol */
+.manga-card:hover .manga-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* --- ADAPTATION MOBILE --- */
+@media (max-width: 800px) {
+    .manga-tooltip {
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%; /* Couvre l'image sur mobile */
+        box-sizing: border-box;
+        transform: none;
+        border-radius: 8px;
+    }
+    .manga-tooltip::after {
+        display: none; /* Enlève la flèche sur mobile */
+    }
+}

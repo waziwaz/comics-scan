@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Manga Reader - Accueil</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="Oneshot_game_logo.png">
 </head>
 <body>
     <header>
@@ -14,47 +15,63 @@
     <main class="manga-grid" id="manga-catalogue"></main>
 
     <script>
-        const container = document.getElementById('manga-catalogue');
-        
-        // Fonction pour vérifier si une image existe et créer la case
-        async function chargerCouvertures() {
-            let i = 1;
-            let continueChecking = true;
+        const baseDonneesMangas = [
+            {
+                id: "manyShot",
+                nom: "ManyShot",
+                description: "contient 3 histoire : Niko-kun fait la sieste, Jouets et Niko-kun, Niko après ça. Qui nous montrerons a quel poins Niko est un petit pervers ;)",
+                personnages: "Niko, Dieu, Calamus, Alula",
+                parodie: "One Shot", 
+                categorie: "Hentai / Fantasy"
+            },
+        ];
 
-            while (continueChecking) {
-                const imgUrl = `couvertures/${i}.png`;
+        const container = document.getElementById('manga-catalogue');
+
+        async function genererCatalogue() {
+            for (const manga of baseDonneesMangas) {
+                const coverUrl = `couvertures/${manga.id}Cover.png`;
                 
-                try {
-                    const response = await fetch(imgUrl, { method: 'HEAD' });
+                // --- NOUVEAU : On compte les pages avant d'afficher ---
+                const nbPages = await compterPages(manga.id);
+                
+                const card = document.createElement('a');
+                card.href = `lecture.html?manga=${manga.id}`;
+                card.className = 'manga-card';
+                
+                card.innerHTML = `
+                    <img src="${coverUrl}" alt="Manga ${manga.nom} VF">
                     
-                    if (response.ok) {
-                        // Si l'image existe, on crée le HTML de la carte
-                        const card = document.createElement('a');
-                        card.href = `lecture.html?ch=${i}`; // On envoie le numéro du chapitre dans l'URL
-                        card.className = 'manga-card';
-                        
-                        card.innerHTML = `
-                            <img src="${imgUrl}" alt="Couverture ${i}">
-                            <div class="info">
-                                <h3>Chapitre ${i}</h3>
-                            </div>
-                        `;
-                        
-                        container.appendChild(card);
-                        i++; // On passe au numéro suivant
-                    } else {
-                        continueChecking = false; // On s'arrête dès qu'une image manque
-                    }
-                } catch (error) {
-                    continueChecking = false;
-                }
-                
-                // Sécurité pour éviter une boucle infinie si tu as une erreur réseau
-                if (i > 500) break; 
+                    <div class="manga-tooltip">
+                        <h4>${manga.nom}</h4>
+                        <p><strong>Description :</strong> ${manga.description}</p>
+                        <p><strong>Persos :</strong> ${manga.personnages}</p>
+                        <p><strong>Type :</strong> ${manga.parodie === "Original" ? "✨ Œuvre Originale" : "🎭 Parodie de " + manga.parodie}</p>
+                        <span class="badge">${manga.categorie}</span>
+                    </div>
+
+                    <div class="info">
+                        <h3>${manga.nom}</h3>
+                        <p class="page-count">${nbPages} pages</p> </div>
+                `;
+                container.appendChild(card);
             }
         }
+        async function compterPages(manga) {
+            let count = 0;
+            let exist = true;
+            while (exist && count < 200) { // Sécurité à 200 pages
+                const testImg = `scans/${manga}/${manga}-page-${count + 1}-vf.png`;
+                try {
+                    const res = await fetch(testImg, { method: 'HEAD' });
+                    if (res.ok) count++;
+                    else exist = false;
+                } catch { exist = false; }
+            }
+            return count;
+        }
 
-        chargerCouvertures();
+        genererCatalogue();
     </script>
 </body>
 </html>

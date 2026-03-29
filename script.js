@@ -1,61 +1,53 @@
-// 1. Récupérer le numéro du chapitre dans l'URL (ex: lecture.html?ch=2)
+// 1. Récupérer les paramètres d'abord !
 const params = new URLSearchParams(window.location.search);
-const chapitreNum = params.get('ch') || "1"; 
-document.getElementById('chapitre-title').innerText = `${chapitreNum}`;
+const mangaNom = params.get('manga') || "manyShot"; 
+const chapitreNum = "01"; // Optionnel, pour le nom du fichier ZIP
+
+// 2. Modifier l'affichage
+document.title = `Lire ${mangaNom} en VF - Manga Reader`;
+document.getElementById('chapitre-title').innerText = mangaNom;
 
 const container = document.getElementById('pages-container');
 
-// 2. Fonction récursive pour charger les pages une par une sans erreur CORS
 function chargerPages(p = 1) {
-    const imgPath = `scans/${chapitreNum}/${p}.png`;
+    const imgPath = `scans/${mangaNom}/${mangaNom}-page-${p}-vf.png`;
     const img = new Image();
     img.src = imgPath;
     img.className = 'manga-page';
+    img.alt = `${mangaNom} - Page ${p} - VF`;
 
     img.onload = function() {
-        // Si l'image existe, on l'ajoute au conteneur
         container.appendChild(img);
-        // On tente de charger la page suivante
-        chargerPages(p + 1);
+        chargerPages(p + 1); // Continue tant qu'une image est trouvée
     };
-
     img.onerror = function() {
-        // Dès qu'une image ne charge pas, on s'arrête
-        console.log(`Fin du chapitre : ${p - 1} pages chargées.`);
+        console.log(`Fin de lecture : ${p - 1} pages chargées.`);
     };
 }
 
-// Lancer le chargement au démarrage
 chargerPages();
 
-// 3. Logique de téléchargement ZIP
+// 3. Logique ZIP (Corrigée avec chapitreNum)
 document.getElementById('downloadZip').addEventListener('click', async function() {
     const zip = new JSZip();
     const btn = this;
     const images = document.querySelectorAll('.manga-page');
 
-    if (images.length === 0) {
-        alert("Aucune page à télécharger.");
-        return;
-    }
+    if (images.length === 0) return alert("Aucune page chargée.");
 
-    btn.innerText = "Préparation du ZIP...";
+    btn.innerText = "Préparation...";
     btn.disabled = true;
 
     try {
         for (let i = 0; i < images.length; i++) {
-            const img = images[i];
-            const response = await fetch(img.src);
+            const response = await fetch(images[i].src);
             const blob = await response.blob();
-            const fileName = `${String(i + 1).padStart(3, '0')}.png`;
-            zip.file(fileName, blob);
+            zip.file(`${String(i + 1).padStart(3, '0')}.png`, blob);
         }
-
         const content = await zip.generateAsync({type: "blob"});
-        saveAs(content, `Manga_Chapitre_${chapitreNum}.zip`);
-    } catch (error) {
-        console.error(error);
-        alert("Erreur : Le téléchargement ZIP nécessite un serveur (Live Server ou GitHub Pages).");
+        saveAs(content, `${mangaNom}_Chapitre.zip`);
+    } catch (e) {
+        alert("Erreur de téléchargement (CORS).");
     } finally {
         btn.innerText = "⬇ Télécharger (.zip)";
         btn.disabled = false;
