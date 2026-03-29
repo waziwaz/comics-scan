@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Manga Reader - Accueil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Ma Bibliothèque Manga</h1>
+    </header>
+
+    <main class="manga-grid" id="manga-catalogue"></main>
+
+    <script>
+        const container = document.getElementById('manga-catalogue');
+        
+        // Fonction pour vérifier si une image existe et créer la case
+        async function chargerCouvertures() {
+            let i = 1;
+            let continueChecking = true;
+
+            while (continueChecking) {
+                const imgUrl = `couvertures/${i}.png`;
+                
+                try {
+                    const response = await fetch(imgUrl, { method: 'HEAD' });
+                    
+                    if (response.ok) {
+                        // Si l'image existe, on crée le HTML de la carte
+                        const card = document.createElement('a');
+                        card.href = `lecture.html?ch=${i}`; // On envoie le numéro du chapitre dans l'URL
+                        card.className = 'manga-card';
+                        
+                        card.innerHTML = `
+                            <img src="${imgUrl}" alt="Couverture ${i}">
+                            <div class="info">
+                                <h3>Chapitre ${i}</h3>
+                            </div>
+                        `;
+                        
+                        container.appendChild(card);
+                        i++; // On passe au numéro suivant
+                    } else {
+                        continueChecking = false; // On s'arrête dès qu'une image manque
+                    }
+                } catch (error) {
+                    continueChecking = false;
+                }
+                
+                // Sécurité pour éviter une boucle infinie si tu as une erreur réseau
+                if (i > 500) break; 
+            }
+        }
+
+        chargerCouvertures();
+    </script>
+</body>
+</html>

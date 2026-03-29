@@ -1,0 +1,62 @@
+body {
+    background-color: #121212;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
+
+/* Accueil */
+.manga-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.manga-card {
+    text-decoration: none;
+    color: white;
+    transition: transform 0.3s;
+}
+
+.manga-card:hover { transform: scale(1.05); }
+
+.manga-card img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+/* Lecteur */
+.reader-nav {
+    position: fixed;
+    top: 0; width: 100%;
+    background: rgba(0,0,0,0.8);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 100;
+}
+
+.reader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 60px;
+}
+
+.manga-page {
+    max-width: 900px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 5px; /* Espace réduit pour la lecture d'affilée */
+}
+
+button {
+    background: #e50914;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
